@@ -1,0 +1,12 @@
+import { Router } from 'express';
+import { prisma } from '../config/prisma.js';
+import { authenticate } from '../middleware/auth.js';
+import { cartItemSchema, cartQuantitySchema } from '../validators/schemas.js';
+import { AppError, asyncHandler, created, ok } from '../utils/http.js';
+
+export const cartRouter = Router(); cartRouter.use(authenticate);
+const cart = (userId) => prisma.cartItem.findMany({ where: { userId }, include: { product: { include: { category: true } } }, orderBy: { createdAt: 'desc' } });
+cartRouter.get('/', asyncHandler(async (req, res) => ok(res, await cart(req.user.id))));
+cartRouter.post('/items', asyncHandler(async (req, res) => { const input = cartItemSchema.parse(req.body); const product = await prisma.product.findFirst({ where: { id: input.productId, isActive: true } }); if (!product) throw new AppError(404, 'PRODUCT_NOT_FOUND', 'Product not found.'); if (input.quantity > product.stock) throw new AppError(409, 'INSUFFICIENT_STOCK', 'The requested quantity is unavailable.'); const item = await prisma.cartItem.upsert({ where: { userId_productId: { userId: req.user.id, productId: input.productId } }, create: { userId: req.user.id, ...input }, update: { quantity: { increment: input.quantity } }, include: { product: true } }); if (item.quantity > product.stock) { await prisma.cartItem.update({ where: { id: item.id }, data: { quantity: product.stock } }); throw new AppError(409, 'INSUFFICIENT_STOCK', 'Only the available quantity was kept in your cart.'); } created(res, item); }));
+cartRouter.patch('/items/:id', asyncHandler(async (req, res) => { const { quantity } = cartQuantitySchema.parse(req.body); const existing = await prisma.cartItem.findFirst({ where: { id: req.params.id, userId: req.user.id }, include: { product: true } }); if (!existing) throw new AppError(404, 'CART_ITEM_NOT_FOUND', 'Cart item not found.'); if (quantity > existing.product.stock) throw new AppError(409, 'INSUFFICIENT_STOCK', 'The requested quantity is unavailable.'); ok(res, await prisma.cartItem.update({ where: { id: existing.id }, data: { quantity }, include: { product: true } })); }));
+cartRouter.delete('/items/:id', asyncHandler(async (req, res) => { const result = await prisma.cartItem.deleteMany({ where: { id: req.params.id, userId: req.user.id } }); if (!result.count) throw new AppError(404, 'CART_ITEM_NOT_FOUND', 'Cart item not found.'); res.status(204).end(); }));

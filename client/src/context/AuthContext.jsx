@@ -1,0 +1,4 @@
+import { createContext, useContext, useEffect, useState } from 'react'; import { api } from '../lib/api.js';
+const AuthContext = createContext(null);
+export function AuthProvider({ children }) { const [user, setUser] = useState(null); const [loading, setLoading] = useState(true); useEffect(() => { api.get('/auth/me').then(({ data }) => setUser(data.data.user)).catch(() => setUser(null)).finally(() => setLoading(false)); }, []); const login = async (values) => { const { data } = await api.post('/auth/login', values); document.cookie = `orderflow_csrf=${encodeURIComponent(data.data.csrfToken)}; path=/; SameSite=Lax`; setUser(data.data.user); }; const logout = async () => { await api.post('/auth/logout'); document.cookie = 'orderflow_csrf=; Max-Age=0; path=/'; setUser(null); }; return <AuthContext.Provider value={{ user, loading, login, logout, setUser }}>{children}</AuthContext.Provider>; }
+export const useAuth = () => useContext(AuthContext);

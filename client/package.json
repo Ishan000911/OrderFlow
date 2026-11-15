@@ -1,0 +1,9 @@
+{
+  "name": "@orderflow/client",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": { "dev": "vite", "build": "vite build", "lint": "eslint .", "test": "vitest run", "e2e": "playwright test" },
+  "dependencies": { "@hookform/resolvers": "^5.2.2", "@tanstack/react-query": "^5.90.5", "axios": "^1.12.2", "clsx": "^2.1.1", "lucide-react": "^0.548.0", "react": "^19.2.0", "react-dom": "^19.2.0", "react-hook-form": "^7.65.0", "react-router-dom": "^7.9.4", "recharts": "^3.3.0", "socket.io-client": "^4.8.1", "tailwind-merge": "^3.3.1", "zod": "^4.1.12" },
+  "devDependencies": { "@eslint/js": "^9.38.0", "@playwright/test": "^1.56.1", "@vitejs/plugin-react": "^5.0.4", "autoprefixer": "^10.4.21", "eslint": "^9.38.0", "eslint-plugin-react": "^7.37.5", "eslint-plugin-react-hooks": "^7.0.1", "eslint-plugin-react-refresh": "^0.4.24", "jsdom": "^27.0.1", "postcss": "^8.5.6", "tailwindcss": "^3.4.18", "vite": "^7.1.11", "vitest": "^5.1.0" }
+}

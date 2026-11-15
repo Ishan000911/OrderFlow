@@ -1,0 +1,5 @@
+import { LoaderCircle, PackageOpen } from 'lucide-react';
+export function Spinner() { return <div className="flex min-h-52 items-center justify-center"><LoaderCircle className="animate-spin text-brand-600" /></div>; }
+export function Empty({ title = 'Nothing here yet', body = 'There is no data to show.' }) { return <div className="card flex flex-col items-center px-6 py-16 text-center"><PackageOpen className="mb-4 size-10 text-slate-300"/><h3 className="font-semibold">{title}</h3><p className="mt-1 text-sm text-slate-500">{body}</p></div>; }
+export function Badge({ children, tone = 'slate' }) { const tones = { slate: 'bg-slate-100 text-slate-700', green: 'bg-emerald-50 text-emerald-700', amber: 'bg-amber-50 text-amber-700', blue: 'bg-blue-50 text-blue-700', red: 'bg-red-50 text-red-700' }; return <span className={`inline-flex rounded-full px-2.5 py-1 text-xs font-semibold ${tones[tone]}`}>{children}</span>; }
+export const statusTone = { PENDING: 'amber', CONFIRMED: 'blue', SHIPPED: 'blue', DELIVERED: 'green', CANCELLED: 'red' };
